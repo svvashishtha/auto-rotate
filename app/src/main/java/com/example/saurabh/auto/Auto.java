@@ -1,14 +1,19 @@
 package com.example.saurabh.auto;
 
+import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.RemoteViews;
+
+import java.util.Calendar;
 
 
 /**
@@ -16,6 +21,9 @@ import android.widget.RemoteViews;
  *
  */
 public class Auto extends AppWidgetProvider {
+    private int temp =0;
+    AlarmManager alarmManager;
+    PendingIntent service = null;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -26,9 +34,23 @@ public class Auto extends AppWidgetProvider {
             RemoteViews remoteViews = new RemoteViews(context.getPackageName(),R.layout.auto);
 
             remoteViews.setOnClickPendingIntent(R.id.image, buildPending(context));
+
+
             pushWidgetUpdate(context,remoteViews);
         }
+
+        alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE) ;
+       Intent up_intent = new Intent(context,MyService.class);
+       final Calendar time = Calendar.getInstance();
+        time.set(Calendar.MINUTE,0);
+        time.set(Calendar.SECOND,0);
+        if(service==null)
+            service = PendingIntent.getService(context, 10, up_intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+       alarmManager.setRepeating(AlarmManager.RTC, time.getTime().getTime(),5 * 60 * 1000, service);
+
     }
+
     public static PendingIntent buildPending (Context context)
     {
         Intent intent = new Intent();
@@ -49,7 +71,7 @@ public class Auto extends AppWidgetProvider {
 
     @Override
     public void onDisabled(Context context) {
-        // Enter relevant functionality for when the last widget is disabled
+        alarmManager.cancel(service);
     }
 
     public static void pushWidgetUpdate(Context context, RemoteViews remoteViews) {
