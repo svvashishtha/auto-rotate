@@ -47,7 +47,7 @@ public class Auto extends AppWidgetProvider {
         if(service==null)
             service = PendingIntent.getService(context, 10, up_intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-       alarmManager.setRepeating(AlarmManager.RTC, time.getTime().getTime(),5 * 60 * 1000, service);
+       alarmManager.setRepeating(AlarmManager.RTC, time.getTime().getTime(),30 * 60 * 1000, service);
 
     }
 
